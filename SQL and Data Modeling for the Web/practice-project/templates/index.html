@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Document</title>
+    </head>
+    <body>
+        <ul>
+	    {% for d in data %}
+            <li>{{ d.description }}</li>
+	    {% endfor %}
+        </ul>
+    </body>
+</html>
