@@ -5,6 +5,12 @@
         <title>Document</title>
     </head>
     <body>
+        <form action="/todos/create" method="POST">
+            <div>
+		<input name="description" type="text"  id="description" />
+                <input type="submit" value="add"/>
+	    </div>
+        </form>
         <ul>
 	    {% for d in data %}
             <li>{{ d.description }}</li>
