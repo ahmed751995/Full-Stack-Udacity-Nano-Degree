@@ -27,37 +27,89 @@
 	  cursor: pointer;
 	  font-size: 20px;
       }
+      .list-block {
+	  display: inline-block;
+	  vertical-align: top;
+	  margin-right: 50px;
+      }
     </style>
   </head>
   <body>
-    <form id="form">
-      <div>
-	<input name="description" type="text"  id="description" />
-        <input type="submit" value="add"/>
-      </div>
-    </form>
-    <div id="error" class="hidden">Something goes wrong</div>
-    <ul id="todos">
-      {% for d in data %}
-      <li>
-	<input data-id="{{ d.id }}" class="check-completed" type="checkbox" {% if d.completed %} checked {% endif %} />
-	{{ d.description }}
-	<button class="delete-todo" data-id="{{ d.id }}">&cross;</button>
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="list-block">
+      <h3>TODO Lists</h3>
+      <form id="list-form">
+	<div>
+	  <input name="list" type="text"  id="list" />
+          <input type="submit" value="add"/>
+	</div>
+      </form>
+      <div id="error" class="hidden">Something goes wrong</div>
+      <ul id="todos-list">
+	{% for l in todo_lists %}
+	<li>
+	  <input data-id="{{ l.id }}" class="check-completed-list" type="checkbox"/>
+	  <a href="/lists/{{ l.id }}">{{ l.name }}</a>
+	  <button class="delete-list" data-id="{{ l.id }}">&cross;</button>
+	</li>
+	{% endfor %}
+      </ul>
+    </div>
+    <div class="list-block">
+      <h3>TODO Items</h3>
+      <form id="todos-form">
+	<div>
+	  <input name="description" type="text"  id="description" />
+          <input type="submit" value="add"/>
+	</div>
+      </form>
+      <div id="error" class="hidden">Something goes wrong</div>
+      <ul id="todos">
+	{% if todo_list|length > 0 %}
+	<h4 data-id="{{todo_list[0].id}}"> {{ todo_list[0].name }}</h4>
+	{% endif %}
+	{% for d in data %}
+	<li>
+	  <input data-id="{{ d.id }}" class="check-completed" type="checkbox" {% if d.completed %} checked {% endif %} />
+	  {{ d.description }}
+	  <button class="delete-todo" data-id="{{ d.id }}">&cross;</button>
+	</li>
+	{% endfor %}
+      </ul>
+    </div>
 
     <script>
-      const deleteTodos = document.querySelectorAll(".delete-todo");
-      for (let i = 0; i < deleteTodos.length; i++) {
-	  const delete_todo = deleteTodos[i];
-	  delete_todo.onclick = function(e) {
-	      const todoId = e.target.dataset['id'];
-	      fetch('/todos/' + todoId + '/delete', {
-	   	  method: 'DELETE',
- 		  headers: {
- 		      'Content-Type': 'application/json'
-	  	  }
+      
+      // complete list
+      document.querySelectorAll('.check-completed-list').forEach(list => {
+	  
+	  list.onchange = function(e) {
+	      if (e.target.checked) {
+		  fetch('/list/' + e.target.dataset['id']+ '/completed', {
+		      method: 'POST',
+		      headers: {
+			  'Content-Type': 'application/json'
+		      }
+		  })
+		      .then(() => {
+			  document.querySelector('#error').className = 'hidden';
+			  todos  = document.querySelectorAll('.check-completed')
+			  todos.forEach(todo => {
+			      todo.checked = true;
+			  })
+
+		      })
+		      .catch(() => document.querySelector('#error').className = "")
+
+	      }
+	  }
+      });
+
+      //delete list
+      document.querySelectorAll('.delete-list').forEach(list => {
+	  list.onclick = function(e) {
+	      listId = e.target.dataset['id'];
+	      fetch('/todos-list/' + listId + '/delete', {
+		  method: 'DELETE'
 	      })
  		  .then(function() {
 		      const ul = e.target.parentNode.parentNode;
@@ -66,40 +118,61 @@
  		  })
 		  .catch(() => document.querySelector('#error').className = "")
 	  }
-      }
+      });
       
-      const checkBoxes = document.querySelectorAll(".check-completed");
-      for (let i = 0; i < checkBoxes.length; i++) {
-	  const checkBox = checkBoxes[i];
-	  checkBox.onchange = function(e) {
-	      const completed = e.target.checked;
-	      const todoId = e.target.dataset['id'];
-	      fetch('/todos/'+ todoId +'/set-completed', {
-		  method: 'POST',
-		  body: JSON.stringify({
-		      'completed': completed
-		      
-		  }),
-		  headers: {
-		      'Content-Type': 'application/json'
-		  }
-	      })
-		  .then(function() {
-		      document.querySelector('#error').className = 'hidden';
-		  })
-		  .catch(() => {
-		      document.querySelector('#error').className = "";
-		      e.target.checked = !e.target.checked;
-		  })
+      // add new list
+      document.querySelector("#list-form").onsubmit = function(e) {
+	  e.preventDefault();
+	  fetch('/todos-list/create', {
+	      method: 'POST',
+	      body: JSON.stringify({
+		  'name': document.querySelector('#list').value
+	      }),
+	      headers: {
+		  'Content-Type': 'application/json'
+	      }
+	  })
+	      .then(() => window.location.reload(true))
+	      .catch(() => {
+		  document.querySelector('#error').className = "";
+	      });
+      };
 
+      function complete_todo() {
+	  const checkBoxes = document.querySelectorAll(".check-completed");
+	  for (let i = 0; i < checkBoxes.length; i++) {
+	      const checkBox = checkBoxes[i];
+	      checkBox.onchange = function(e) {
+		  const completed = e.target.checked;
+		  const todoId = e.target.dataset['id'];
+		  fetch('/todos/'+ todoId +'/set-completed', {
+		      method: 'POST',
+		      body: JSON.stringify({
+			  'completed': completed
+		      }),
+		      headers: {
+			  'Content-Type': 'application/json'
+		      }
+		  })
+		      .then(function() {
+			  document.querySelector('#error').className = 'hidden';
+		      })
+		      .catch(() => {
+			  document.querySelector('#error').className = "";
+			  e.target.checked = !e.target.checked;
+		      });
+	      }
 	  }
-      }	 
-      document.querySelector("#form").addEventListener('submit', (e) => {
+      }
+      complete_todo();
+      
+      document.querySelector("#todos-form").addEventListener('submit', (e) => {
 	  e.preventDefault();
 	  fetch('/todos/create', {
 	      method:'POST',
 	      body: JSON.stringify({
-		  'description': document.querySelector('#description').value
+		  'description': document.querySelector('#description').value,
+		  'list_id' : document.querySelector('#todos h4').dataset['id']
 	      }),
 	      headers: {
 		  "Content-Type": "application/json"
@@ -108,14 +181,40 @@
 	      .then(response => response.json())
 	      .then(todo => {
 		  const li = document.createElement("li");
-		  li.innerHTML = `<input type="checkbox" data-id= "${todo['id']}"/> ${todo['description']} <button class="delete-todo" data-id="${todo['id']}">&cross;</button>`;
+		  li.innerHTML = `<input type="checkbox" class="check-completed" data-id= "${todo['id']}"/> ${todo['description']} <button class="delete-todo" data-id="${todo['id']}">&cross;</button>`;
 		  document.querySelector('#todos').appendChild(li);
 		  document.querySelector('#error').className = 'hidden';
 		  document.querySelector("#description").value = "";
+		  complete_todo();
+		  delete_todo();
 	      })
 	      .catch(() => {document.querySelector('#error').className = ""})
 	  
       });
+
+      function delete_todo() {
+	  const todosList = document.querySelectorAll(".delete-todo");
+	  for (let i = 0; i < todosList.length; i++) {
+	      const delete_todo = todosList[i];
+	      delete_todo.onclick = function(e) {
+		  const todoId = e.target.dataset['id'];
+		  fetch('/todos/' + todoId + '/delete', {
+	   	      method: 'DELETE',
+ 		      headers: {
+ 			  'Content-Type': 'application/json'
+	  	      }
+		  })
+ 		      .then(function() {
+			  const ul = e.target.parentNode.parentNode;
+			  ul.removeChild(e.target.parentNode);
+			  document.querySelector('#error').className = 'hidden';
+ 		      })
+		      .catch(() => document.querySelector('#error').className = "")
+	      }
+	  }
+      }
+      delete_todo();
     </script>
+	  
   </body>
 </html>
