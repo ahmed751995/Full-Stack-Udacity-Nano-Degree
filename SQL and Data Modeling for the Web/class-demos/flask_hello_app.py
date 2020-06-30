@@ -19,6 +19,24 @@ class Person(db.Model):
     def __repr__(self):
         return f'<ID: {self.id}, name: {self.name}>'
 
+
+class Driver(db.Model):
+    __tablename__ = 'drivers'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    state = db.Column(db.String(), nullable=True)
+    issued = db.Column(db.DateTime, nullable=False)
+    vehicles = db.relationship('Vehicle', backref='driver', lazy=True)
+
+
+class Vehicle(db.Model):
+    __tablename__ = 'vehicles'
+    id = db.Column(db.Integer, primary_key=True)
+    make = db.Column(db.String(), nullable=False)
+    model = db.Column(db.String(), nullable=False)
+    year = db.Column(db.DateTime, nullable=False)
+    driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
+    
 db.create_all()
 
 @app.route('/')
