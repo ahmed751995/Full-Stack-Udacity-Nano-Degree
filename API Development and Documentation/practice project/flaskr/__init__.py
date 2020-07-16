@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy #, or_
 from flask_cors import CORS
 import random
 
-from models import setup_db, Book
+from .models import setup_db, Book
 
 BOOKS_PER_SHELF = 8
 
