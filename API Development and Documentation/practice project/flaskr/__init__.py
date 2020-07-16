@@ -118,6 +118,32 @@ def create_app(test_config=None):
         except:
             abort(422)
 
+
+    @app.route('/search', methods=['POST'])
+    def search_book():
+        body = request.get_json()
+        try:
+            book_title = body.get('search', None)
+        except:
+            abort(400)
+            
+        try:
+            books = Book.query.order_by(Book.id).filter(Book.title == book_title).all()
+            current_books = paginate_books(request, books)
+            
+            if len(books) == 0:
+                raise
+                
+            return jsonify({
+                'success': True,
+                'books': current_books,
+                'total_books': len(books)
+            })
+
+        except:
+            abort(404)
+
+            
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({

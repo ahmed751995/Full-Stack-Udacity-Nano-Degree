@@ -76,6 +76,34 @@ class BookTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
+
+
+    def test_search_books(self):
+        """Test searched books"""
+        res = self.client().post('/search', json={'search':'book3'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['books']))
+        self.assertTrue(data['total_books'])
+
+    
+    def test_404_search_books(self):
+        """Test searched books"""
+        res = self.client().post('/search', json={'search':'s'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_400_search_books(self):
+        """Test searched books"""
+        res = self.client().post('/search')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
         
 # @TODO: Write at least two tests for each endpoint - one each for success and error behavior.
 #        You can feel free to write additional tests for nuanced functionality,
