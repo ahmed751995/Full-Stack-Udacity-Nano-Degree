@@ -104,14 +104,6 @@ class BookTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
-        
-# @TODO: Write at least two tests for each endpoint - one each for success and error behavior.
-#        You can feel free to write additional tests for nuanced functionality,
-#        Such as adding a book without a rating, etc. 
-#        Since there are four routes currently, you should have at least eight tests. 
-# Optional: Update the book information in setUp to make the test database your own! 
-
-# Make the tests conveniently executable
 
 
 if __name__ == "__main__":
