@@ -105,20 +105,34 @@ def verify_decode_jwt(token):
             }, 400)
 
 
-def requires_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        token = get_token_auth_header()
-        try:
-            payload = verify_decode_jwt(token)
-        except:
-            abort(401)
-        return f(payload, *args, **kwargs)
+def check_permission(permission, payload):
+    if 'permissions' not in payload:
+       abort(400)
+    
+    if permission not in payload['permissions']:
+        abort(403)
 
-    return wrapper
+    return True
 
-@app.route('/headers')
-@requires_auth
+def requires_auth(permission=''):
+    def requires_auth_decor(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            token = get_token_auth_header()
+            try:
+                payload = verify_decode_jwt(token)
+            except:
+                abort(401)
+                
+            check_permission(permission, payload)
+            return f(payload, *args, **kwargs)
+
+        return wrapper
+    return requires_auth_decor
+
+
+@app.route('/images')
+@requires_auth('get:images')
 def headers(payload):
     print(payload)
     return 'Access Granted'

@@ -4,6 +4,7 @@
    
    *hint* ==> you should never store be storing plain text password in our data
               base.
+
 ** password and Authentication
 *** HTTP Status Codes
    Two status codes which are important throughout this course are:
@@ -57,7 +58,6 @@
 
    [[./notes/microservice.png]]
 
-   
 ** Common Auth services
    * [[https://auth0.com/][Auth0]]
    * [[https://aws.amazon.com/cognito/][AWS Cognito]]
@@ -67,7 +67,6 @@
 ** Authentication sequence diagram
 
 [[./notes/auth.png]]
-
 
 ** [[https://jwt.io/][JWT]] - JSON Web Tokens
 
@@ -87,7 +86,6 @@
 	      the auth service we know that the data has been tampered with
 	      in transmission.
 
-
 ** Local Storage
    
    token is stored in local storage
@@ -103,7 +101,6 @@
      - Persistent:
        remain in browser memory even after leaving the website or close the
        browser.
-
 
 ** Validate JWT
    this is a starter code to validate JWT
