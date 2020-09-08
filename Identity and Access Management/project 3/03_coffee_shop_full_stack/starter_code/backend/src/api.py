@@ -113,7 +113,7 @@ def post_drink(payload):
 
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(pyload, id):
+def edit_drink(payload, id):
     try:
         drink = Drink.query.filter(Drink.id == id).one_or_none()
         if drink is None:  # ensure that the drink was found

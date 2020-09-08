@@ -1,3 +1,9 @@
 [submodule "Server Deployment, Containerization and Testing/project 4/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS"]
 	path = Server Deployment, Containerization and Testing/project 4/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS
 	url = https://github.com/ahmed751995/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS.git
+[submodule "FSND Capstone/FSND-capstone-project"]
+	path = FSND Capstone/FSND-capstone-project
+	url = https://github.com/ahmed751995/FSND-capstone-project.git
+[submodule "FSND capston/FSND-capstone-project"]
+	path = FSND capston/FSND-capstone-project
+	url = https://github.com/ahmed751995/FSND-capstone-project.git
